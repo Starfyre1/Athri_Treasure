@@ -1,6 +1,7 @@
 /* Copyright (C) Starfyre Enterprises 2022. All rights reserved. */
 package src.com.starfyre1.startup;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -66,7 +70,6 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	 * Constants
 	 ****************************************************************************/
 	private static final String[]		LABELS			= { "CP", "SP", "GP", "Gems", "Jewelry", "Magic Items" };																																																				//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-
 	private static final String[]		GEMS_VALUES		= { "10 SP", "50 SP", "100 SP", "500 SP", "1000 SP*", "5000 SP**" };																																																	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	private static final int[][]		ODDS			= { { 50, 50, 10, 0, 0, 1 }, { 50, 50, 10, 10, 0, 2 }, { 0, 0, 0, 15, 25, 3 },																																															//
@@ -81,18 +84,21 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 					{ "8D100", "6D100", "1D100", "5D6", "3D10", "-1" }, { "1D100", "1D100", "5D12", "2D20", "2D6", "-1" },																																																		// //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
 					{ "0", "0", "4D10", "2D20", "1D10", "-1" }, { "0", "2D100", "8D10", "2D20", "2D6", "-1" } };																																																				//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
 
-	private static final Dimension		WINDOW_SIZE		= new Dimension(340, 140);
+	private static final String			DIVIDER			= new String("\n    =================================================================================================================\n\n");																															//$NON-NLS-1$
+	private static final Dimension		WINDOW_SIZE		= new Dimension(1000, 1000);
 	private static final JButton		GENERATE_BUTTON	= new JButton("Generate");																																																												//$NON-NLS-1$
+	private static final JButton		CLEAR_BUTTON	= new JButton("Clear");																																																													//$NON-NLS-1$
 
 	/*****************************************************************************
 	 * Member Variables
 	 ****************************************************************************/
-	static JFrame						mFrame;
-	static Random						rand			= new Random();
+	private static JFrame				mFrame;
+	private static Random				rand			= new Random();
 	private static TreasureGenerator	sInstance;
 
-	JTextField							mEncountersEntry;
-	JTextField							mTeirEntry;
+	private JTextArea					mResultsView;
+	private JTextField					mEncountersEntry;
+	private JTextField					mTeirEntry;
 	// only used for Jewelry with mounted gems
 	private int							mGemValue;
 
@@ -109,7 +115,14 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				} catch (Exception ex) {
 					System.err.println(ex);
 				}
-				generateEntryDisplay();
+				mFrame = new JFrame("Treasure Generator"); //$NON-NLS-1$
+				mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+				JPanel display = generateEntryDisplay();
+
+				mFrame.add(display);
+				mFrame.setSize(WINDOW_SIZE);
+				mFrame.setVisible(true);
 			}
 		});
 	}
@@ -123,11 +136,14 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	 ****************************************************************************/
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String s = e.getActionCommand();
-		if (s.equals("Generate")) { //$NON-NLS-1$
+		String command = e.getActionCommand();
+		if (command.equals("Generate")) { //$NON-NLS-1$
 			int number = Integer.parseInt(mEncountersEntry.getText().trim());
 			int tier = Integer.parseInt(mTeirEntry.getText().trim());
-			generateAmount(tier, number);
+			mResultsView.append(generateAmount(tier, number));
+			//buttonUpdate();
+		} else if (command.equals("Clear")) { //$NON-NLS-1$
+			mResultsView.setText(""); //$NON-NLS-1$
 		}
 	}
 
@@ -148,58 +164,68 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 
 	private void buttonUpdate() {
 		GENERATE_BUTTON.setEnabled(!(mEncountersEntry.getText().isBlank() || mTeirEntry.getText().isBlank()));
+		CLEAR_BUTTON.setEnabled(mResultsView.getDocument().getLength() > 0);
 	}
 
-	private void generateEntryDisplay() {
-		mFrame = new JFrame("Treasure Generator"); //$NON-NLS-1$
-		mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-		JPanel outerWrapper = new JPanel();
-		BoxLayout bl = new BoxLayout(outerWrapper, BoxLayout.Y_AXIS);
+	private JPanel generateEntryDisplay() {
+		JPanel outerWrapper = new JPanel(new BorderLayout());
 		outerWrapper.setBorder(new CompoundBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EtchedBorder(EtchedBorder.RAISED)), new EtchedBorder(EtchedBorder.LOWERED)));
-		outerWrapper.setLayout(bl);
 
-		JPanel wrapper = new JPanel();
+		JPanel upperWrapper = new JPanel();
+		BoxLayout bl = new BoxLayout(upperWrapper, BoxLayout.Y_AXIS);
+		upperWrapper.setLayout(bl);
+
 		JLabel encounters = new JLabel("Monsters Encountered (1-500)", SwingConstants.RIGHT); //$NON-NLS-1$
 		mEncountersEntry = new JTextField(5);
 		AbstractDocument document = (AbstractDocument) mEncountersEntry.getDocument();
 		document.setDocumentFilter(new IntegerFilter(500));
 		document.addDocumentListener(this);
-
+		JPanel wrapper = new JPanel();
 		wrapper.add(encounters);
 		wrapper.add(mEncountersEntry);
-		outerWrapper.add(wrapper);
+		upperWrapper.add(wrapper);
 
-		wrapper = new JPanel();
 		JLabel teir = new JLabel("Treasure Tier (1-12)", SwingConstants.RIGHT); //$NON-NLS-1$
 		mTeirEntry = new JTextField(5);
 		document = (AbstractDocument) mTeirEntry.getDocument();
 		document.setDocumentFilter(new IntegerFilter(12));
 		document.addDocumentListener(this);
-
+		wrapper = new JPanel();
 		wrapper.add(teir);
 		wrapper.add(mTeirEntry);
-		outerWrapper.add(wrapper);
-
+		upperWrapper.add(wrapper);
 		Dimension size = encounters.getPreferredSize();
 		Dimension temp = teir.getPreferredSize();
 		if (temp.getWidth() > size.getWidth()) {
 			size.setSize(temp);
 		}
-
 		encounters.setPreferredSize(size);
 		teir.setPreferredSize(size);
-
-		outerWrapper.add(Box.createVerticalGlue());
+		upperWrapper.add(Box.createVerticalGlue());
 
 		GENERATE_BUTTON.addActionListener(sInstance);
 		GENERATE_BUTTON.setEnabled(false);
+		CLEAR_BUTTON.addActionListener(sInstance);
+		CLEAR_BUTTON.setEnabled(false);
+		wrapper = new JPanel();
+		wrapper.add(GENERATE_BUTTON);
+		wrapper.add(CLEAR_BUTTON);
+		upperWrapper.add(wrapper);
 
-		outerWrapper.add(GENERATE_BUTTON);
+		mResultsView = new JTextArea();
+		mResultsView.setMinimumSize(new Dimension(400, 400));
+		mResultsView.getDocument().addDocumentListener(this);
+		mResultsView.setTabSize(4);
 
-		mFrame.add(outerWrapper);
-		mFrame.setSize(WINDOW_SIZE);
-		mFrame.setVisible(true);
+		JScrollPane scrollPane = new JScrollPane(mResultsView);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		outerWrapper.add(upperWrapper, BorderLayout.NORTH);
+		outerWrapper.add(scrollPane, BorderLayout.CENTER);
+
+		return outerWrapper;
+
 	}
 
 	/*
@@ -226,9 +252,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 					if (percent >= chance) {
 						value++;
 					}
-
 				}
 			}
+
 			display.append(value + " " + LABELS[i]); //$NON-NLS-1$
 			if (i == 3 && value > 0) {
 				display.append(generateGems(value));
@@ -239,7 +265,8 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			}
 			display.append("\n"); //$NON-NLS-1$
 		}
-		System.out.println(display.toString());
+		display.append(DIVIDER);
+
 		return display.toString();
 	}
 
@@ -319,11 +346,11 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				amount.append(generateMiscMagic());
 			} else if (value < 91) {
 				amount.append(generateMagicWeapon());
-				amount.append(" AND "); //$NON-NLS-1$
+				amount.append("\tAND "); //$NON-NLS-1$
 				amount.append(generateMiscMagic());
 			} else {
 				amount.append(generateMagicArmor());
-				amount.append(" AND "); //$NON-NLS-1$
+				amount.append("\tAND "); //$NON-NLS-1$
 				amount.append(generateMiscMagic());
 			}
 			amount.append(" }\n"); //$NON-NLS-1$
@@ -671,7 +698,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			type = generateItemPowers();
-			type += " AND "; //$NON-NLS-1$
+			type += "\tAND "; //$NON-NLS-1$
 			type += generateItemPowers();
 		}
 
