@@ -14,8 +14,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -96,7 +96,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	private static Random				rand			= new Random();
 	private static TreasureGenerator	sInstance;
 
-	private JTextPane					mResultsView;
+	private JTextArea					mResultsView;
 	private JTextField					mEncountersEntry;
 	private JTextField					mTeirEntry;
 	// only used for Jewelry with mounted gems
@@ -140,8 +140,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		if (command.equals("Generate")) { //$NON-NLS-1$
 			int number = Integer.parseInt(mEncountersEntry.getText().trim());
 			int tier = Integer.parseInt(mTeirEntry.getText().trim());
-			mResultsView.replaceSelection(generateTreasure(tier, number));
-			//buttonUpdate();
+			mResultsView.append(generateTreasure(tier, number));
 		} else if (command.equals("Clear")) { //$NON-NLS-1$
 			mResultsView.setText(""); //$NON-NLS-1$
 		}
@@ -212,21 +211,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		wrapper.add(CLEAR_BUTTON);
 		upperWrapper.add(wrapper);
 
-		mResultsView = new JTextPane();
+		mResultsView = new JTextArea();
 		mResultsView.setMinimumSize(new Dimension(400, 400));
 		mResultsView.getDocument().addDocumentListener(this);
-		//
-		//		TabStop[] tabs = new TabStop[4];
-		//		tabs[0] = new TabStop(4, TabStop.ALIGN_RIGHT, TabStop.LEAD_NONE);
-		//		tabs[1] = new TabStop(8, TabStop.ALIGN_LEFT, TabStop.LEAD_NONE);
-		//		tabs[2] = new TabStop(12, TabStop.ALIGN_RIGHT, TabStop.LEAD_NONE);
-		//		tabs[3] = new TabStop(16, TabStop.ALIGN_LEFT, TabStop.LEAD_NONE);
-		//		TabSet tabset = new TabSet(tabs);
-		//
-		//		StyleContext sc = StyleContext.getDefaultStyleContext();
-		//		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.TabSet, tabset);
-		//		mResultsView.setParagraphAttributes(aset, false);
-		//
+
 		JScrollPane scrollPane = new JScrollPane(mResultsView);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -250,24 +238,24 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			String temp = AMOUNT[tier - 1][i];
 			int percent = ODDS[tier - 1][i];
 			for (int j = 0; j < number; j++) {
-				if (!temp.equals("-1") && !temp.equals("0")) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (temp.equals("-1")) { //$NON-NLS-1$
+					int chance = roll(1, 100);
+					if (percent >= chance) {
+						value++;
+					}
+				} else if (!temp.equals("0")) { //$NON-NLS-1$
 					int chance = roll(1, 100);
 					if (percent >= chance) {
 						int dice = Integer.parseInt(temp.substring(0, 1));
 						int die = Integer.parseInt(temp.substring(2));
 						value += roll(dice, die);
 					}
-				} else if (temp.equals("-1")) { //$NON-NLS-1$
-					int chance = roll(1, 100);
-					if (percent >= chance) {
-						value++;
-					}
 				}
 			}
 
 			display.append(value + " " + LABELS[i]); //$NON-NLS-1$
 			if (i == 3 && value > 0) {
-				display.append("\n" + generateGems(value)); //$NON-NLS-1$
+				display.append("\n" + generateGems(value, false)); //$NON-NLS-1$
 			} else if (i == 4 && value > 0) {
 				display.append("\n" + generateJewelry(value)); //$NON-NLS-1$
 			} else if (i == 5 && value > 0) {
@@ -280,7 +268,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return display.toString();
 	}
 
-	private String generateGems(int count) {
+	private String generateGems(int count, boolean fromJewelry) {
 		StringBuilder amount = new StringBuilder();
 		int[] gems = { 0, 0, 0, 0, 0, 0 };
 		mGemValue = 0;
@@ -307,23 +295,49 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				// Value 1000 SP
 				gems[4]++;
 				mGemValue += 1000;
-				// 5% is magical or has spell cast on it
 			} else {
 				// Value 5000 SP
 				gems[5]++;
 				mGemValue += 5000;
-				// 10% is magical or has spell cast on it
 			}
 		}
 
 		for (int i = 0; i < gems.length; i++) {
 			int gem = gems[i];
 			if (gem > 0) {
-				amount.append("\t[" + gem + " Gems = " + GEMS_VALUES[i] + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (i == 4) {
+					// 5% is magical or has spell cast on it
+					amount.append(determineMagicGems(gem, 95, fromJewelry));
+				} else if (i == 5) {
+					// 10% is magical or has spell cast on it
+					amount.append(determineMagicGems(gem, 90, fromJewelry));
+				} else {
+					amount.append("\t[" + gem + " Gems = " + GEMS_VALUES[i] + "]" + (fromJewelry ? "" : "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				}
 			}
 		}
 
 		return amount.toString();
+	}
+
+	private String determineMagicGems(int count, int percentage, boolean fromJewelry) {
+		String text = ""; //$NON-NLS-1$
+		String other = ""; //$NON-NLS-1$
+		for (int i = 0; i < count; i++) {
+			int roll = roll(1, 100);
+			if (roll > percentage) {
+				count--;
+				String charges = generateCharges();
+				String magicArea = generateMagicArea();
+				String powers = generateItemPowers();
+
+				text += (fromJewelry ? "" : "\n\t") + "\t[1 Gem = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]" + "[Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+			}
+		}
+		if (count > 0) {
+			other = "\t[" + count + " Gems = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		return other + text + (fromJewelry ? "" : "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private String generateJewelry(int count) {
@@ -332,10 +346,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		for (int i = 0; i < count; i++) {
 			int value = roll(1, 100) * roll(1, 8);
 			int mountedGems = roll(1, 6);
-			String gems = generateGems(mountedGems);
+			String gems = generateGems(mountedGems, true);
 			value += mGemValue;
 			amount.append("\t{" + value + " SP Jewelry"); //$NON-NLS-1$ //$NON-NLS-2$
-			amount.append(gems);
+			amount.append((value < 100 ? "\t" : "") + gems); //$NON-NLS-1$ //$NON-NLS-2$
 			amount.append(" }\n"); //$NON-NLS-1$
 		}
 
@@ -356,11 +370,11 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				amount.append(generateMiscMagic());
 			} else if (value < 91) {
 				amount.append(generateMagicWeapon());
-				amount.append("\tAND "); //$NON-NLS-1$
+				amount.append("    AND    "); //$NON-NLS-1$
 				amount.append(generateMiscMagic());
 			} else {
 				amount.append(generateMagicArmor());
-				amount.append("\tAND "); //$NON-NLS-1$
+				amount.append("    AND    "); //$NON-NLS-1$
 				amount.append(generateMiscMagic());
 			}
 			amount.append(" }\n"); //$NON-NLS-1$
@@ -708,7 +722,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			type = generateItemPowers();
-			type += "\tAND "; //$NON-NLS-1$
+			type += "    AND    "; //$NON-NLS-1$
 			type += generateItemPowers();
 		}
 
