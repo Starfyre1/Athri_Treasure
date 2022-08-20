@@ -69,6 +69,8 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	/*****************************************************************************
 	 * Constants
 	 ****************************************************************************/
+	private static final String			TITLE			= "Treasure Generator";
+	private static final String			VERSION			= " V1.0.1";
 	private static final String[]		LABELS			= { "CP", "SP", "GP", "Gems", "Jewelry", "Magic Items" };																																																				//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	private static final String[]		GEMS_VALUES		= { "10 SP", "50 SP", "100 SP", "500 SP", "1000 SP*", "5000 SP**" };																																																	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
@@ -93,8 +95,8 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	 * Member Variables
 	 ****************************************************************************/
 	private static JFrame				mFrame;
-	private static Random				rand			= new Random();
-	private static TreasureGenerator	sInstance;
+	private static Random				mRandom			= new Random();
+	private static TreasureGenerator	mInstance;
 
 	private JTextArea					mResultsView;
 	private JTextField					mEncountersEntry;
@@ -106,7 +108,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	 * Constructors
 	 ****************************************************************************/
 	private TreasureGenerator() {
-		sInstance = this;
+		mInstance = this;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -115,10 +117,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				} catch (Exception ex) {
 					System.err.println(ex);
 				}
-				mFrame = new JFrame("Treasure Generator"); //$NON-NLS-1$
+				mFrame = new JFrame(TITLE + VERSION);
 				mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-				JPanel display = generateEntryDisplay();
+				JPanel display = entryDisplay();
 
 				mFrame.add(display);
 				mFrame.setSize(WINDOW_SIZE);
@@ -140,7 +142,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		if (command.equals("Generate")) { //$NON-NLS-1$
 			int number = Integer.parseInt(mEncountersEntry.getText().trim());
 			int tier = Integer.parseInt(mTeirEntry.getText().trim());
-			mResultsView.append(generateTreasure(tier, number));
+			mResultsView.append(treasure(tier, number));
 		} else if (command.equals("Clear")) { //$NON-NLS-1$
 			mResultsView.setText(""); //$NON-NLS-1$
 		}
@@ -166,7 +168,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		CLEAR_BUTTON.setEnabled(mResultsView.getDocument().getLength() > 0);
 	}
 
-	private JPanel generateEntryDisplay() {
+	private JPanel entryDisplay() {
 		JPanel outerWrapper = new JPanel(new BorderLayout());
 		outerWrapper.setBorder(new CompoundBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EtchedBorder(EtchedBorder.RAISED)), new EtchedBorder(EtchedBorder.LOWERED)));
 
@@ -202,9 +204,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		teir.setPreferredSize(size);
 		upperWrapper.add(Box.createVerticalGlue());
 
-		GENERATE_BUTTON.addActionListener(sInstance);
+		GENERATE_BUTTON.addActionListener(mInstance);
 		GENERATE_BUTTON.setEnabled(false);
-		CLEAR_BUTTON.addActionListener(sInstance);
+		CLEAR_BUTTON.addActionListener(mInstance);
 		CLEAR_BUTTON.setEnabled(false);
 		wrapper = new JPanel();
 		wrapper.add(GENERATE_BUTTON);
@@ -230,7 +232,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	 *  @param tier a value from 1 - 12
 	 *  @param type a value from 0 - 5 (cp, sp, gp, gem, jewelry, magic)
 	 */
-	private String generateTreasure(int tier, int number) {
+	private String treasure(int tier, int number) {
 		StringBuilder display = new StringBuilder();
 
 		for (int i = 0; i < 6; i++) {
@@ -239,27 +241,27 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			int percent = ODDS[tier - 1][i];
 			for (int j = 0; j < number; j++) {
 				if (temp.equals("-1")) { //$NON-NLS-1$
-					int chance = roll(1, 100);
+					int chance = rollDice(1, 100);
 					if (percent >= chance) {
 						value++;
 					}
 				} else if (!temp.equals("0")) { //$NON-NLS-1$
-					int chance = roll(1, 100);
+					int chance = rollDice(1, 100);
 					if (percent >= chance) {
 						int dice = Integer.parseInt(temp.substring(0, 1));
 						int die = Integer.parseInt(temp.substring(2));
-						value += roll(dice, die);
+						value += rollDice(dice, die);
 					}
 				}
 			}
 
 			display.append(value + " " + LABELS[i]); //$NON-NLS-1$
 			if (i == 3 && value > 0) {
-				display.append("\n" + generateGems(value, false)); //$NON-NLS-1$
+				display.append("\n" + gems(value, false)); //$NON-NLS-1$
 			} else if (i == 4 && value > 0) {
-				display.append("\n" + generateJewelry(value)); //$NON-NLS-1$
+				display.append("\n" + jewelry(value)); //$NON-NLS-1$
 			} else if (i == 5 && value > 0) {
-				display.append("\n" + generateMagic(value)); //$NON-NLS-1$
+				display.append("\n" + magic(value)); //$NON-NLS-1$
 			}
 			display.append("\n"); //$NON-NLS-1$
 		}
@@ -270,13 +272,13 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 
 	StringBuilder mAmount;
 
-	private String generateGems(int count, boolean fromJewelry) {
+	private String gems(int count, boolean fromJewelry) {
 		mAmount = new StringBuilder();
 		int[] gems = { 0, 0, 0, 0, 0, 0 };
 		mGemValue = 0;
 
 		for (int i = 0; i < count; i++) {
-			int roll = roll(1, 100);
+			int roll = rollDice(1, 100);
 			if (roll < 11) {
 				// Value 10 SP
 				gems[0]++;
@@ -309,10 +311,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			if (gem > 0) {
 				if (i == 4) {
 					// 5% is magical or has spell cast on it
-					mAmount.append(determineMagicGems(gem, 95, fromJewelry));
+					mAmount.append(magicGems(gem, 95, fromJewelry));
 				} else if (i == 5) {
 					// 10% is magical or has spell cast on it
-					mAmount.append(determineMagicGems(gem, 90, fromJewelry));
+					mAmount.append(magicGems(gem, 90, fromJewelry));
 				} else {
 					mAmount.append((fromJewelry ? "\n\t" : "") + "\t[" + gem + " Gems = " + GEMS_VALUES[i] + "]" + (fromJewelry ? "" : "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 				}
@@ -322,18 +324,18 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return mAmount.toString();
 	}
 
-	private String determineMagicGems(int count, int percentage, boolean fromJewelry) {
+	private String magicGems(int count, int percentage, boolean fromJewelry) {
 		String text = ""; //$NON-NLS-1$
 		String other = ""; //$NON-NLS-1$
 		for (int i = 0; i < count; i++) {
-			int roll = roll(1, 100);
+			int roll = rollDice(1, 100);
 			if (roll > percentage) {
 				count--;
-				String charges = generateCharges();
-				String magicArea = generateMagicArea();
-				String powers = generateItemPowers();
+				String charges = charges();
+				String magicArea = magicArea();
+				String powers = itemPowers();
 
-				text += "\n\t\t[1 Gem = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]" + "[Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+				text += "\n\t\t[1 Gem = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "] [Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			}
 		}
 		if (count > 0) {
@@ -355,15 +357,15 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return other + text + (fromJewelry ? "" : "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private String generateJewelry(int count) {
+	private String jewelry(int count) {
 		StringBuilder amount = new StringBuilder();
 
 		for (int i = 0; i < count; i++) {
-			int value = roll(1, 100) * roll(1, 8);
-			int mountedGems = roll(1, 6);
-			String gems = generateGems(mountedGems, true);
+			int value = rollDice(1, 100) * rollDice(1, 8);
+			int mountedGems = rollDice(1, 6);
+			String gems = gems(mountedGems, true);
 			value += mGemValue;
-			amount.append("\t{" + value + " SP Jewelry"); //$NON-NLS-1$ //$NON-NLS-2$
+			amount.append("\n\t{" + value + " SP Jewelry"); //$NON-NLS-1$ //$NON-NLS-2$
 			amount.append((value < 100 ? "\t" : "") + gems); //$NON-NLS-1$ //$NON-NLS-2$
 			amount.append(" }\n"); //$NON-NLS-1$
 		}
@@ -371,35 +373,35 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return amount.toString();
 	}
 
-	private String generateMagic(int count) {
+	private String magic(int count) {
 		StringBuilder amount = new StringBuilder();
 
 		for (int i = 0; i < count; i++) {
-			int value = roll(1, 100);
+			int value = rollDice(1, 100);
 			amount.append("\t{"); //$NON-NLS-1$
 			if (value < 21) {
-				amount.append(generateMagicWeapon());
+				amount.append(magicWeapon());
 			} else if (value < 41) {
-				amount.append(generateMagicArmor());
+				amount.append(magicArmor());
 			} else if (value < 81) {
-				amount.append(generateMiscMagic());
+				amount.append(miscMagic());
 			} else if (value < 91) {
-				amount.append(generateMagicWeapon());
+				amount.append(magicWeapon());
 				amount.append("    AND    "); //$NON-NLS-1$
-				amount.append(generateMiscMagic());
+				amount.append(miscMagic());
 			} else {
-				amount.append(generateMagicArmor());
+				amount.append(magicArmor());
 				amount.append("    AND    "); //$NON-NLS-1$
-				amount.append(generateMiscMagic());
+				amount.append(miscMagic());
 			}
 			amount.append(" }\n"); //$NON-NLS-1$
 		}
 		return amount.toString();
 	}
 
-	private String generateMagicWeapon() {
+	private String magicWeapon() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		String type;
 		if (value < 26) {
 			type = "Longsword"; //$NON-NLS-1$
@@ -416,18 +418,18 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		} else if (value < 76) {
 			type = "Two-Handed Sword"; //$NON-NLS-1$
 		} else {
-			type = generateMiscWeapon();
+			type = miscWeapon();
 		}
 
-		String rune = generateRune();
+		String rune = runes();
 		amount.append("[" + type + " with " + rune + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		return amount.toString();
 	}
 
-	private String generateMiscWeapon() {
+	private String miscWeapon() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		String type;
 		if (value < 6) {
 			type = "Mace (Light)"; //$NON-NLS-1$
@@ -466,9 +468,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return amount.toString();
 	}
 
-	private String generateRune() {
+	private String runes() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		if (value < 51) {
 			amount.append("Rune of Combat I"); //$NON-NLS-1$
 		} else if (value < 81) {
@@ -486,9 +488,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 
 	}
 
-	private String generateMagicArmor() {
+	private String magicArmor() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		String type;
 		if (value < 5) {
 			type = "Heavy Cloth"; //$NON-NLS-1$
@@ -514,16 +516,16 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			type = "Field Plate"; //$NON-NLS-1$
 		}
 
-		String spell = generateDefensiveSpell();
+		String spell = defensiveSpell();
 
 		amount.append("[" + type + " w/ " + spell + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		return amount.toString();
 	}
 
-	private String generateDefensiveSpell() {
+	private String defensiveSpell() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		if (value < 21) {
 			amount.append("Shield I"); //$NON-NLS-1$
 		} else if (value < 31) {
@@ -579,9 +581,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 
 	}
 
-	private String generateMiscMagic() {
+	private String miscMagic() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		String type;
 
 		if (value < 18) {
@@ -600,6 +602,7 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			type = "Helm"; //$NON-NLS-1$
 		} else if (value < 76) {
 			type = "Gem / Jewelry"; //$NON-NLS-1$
+			// DW Jewelry 75% Gem 25%
 		} else if (value < 86) {
 			type = "Weapon"; //$NON-NLS-1$
 		} else if (value < 91) {
@@ -608,18 +611,18 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			type = "Miscellaneous (GM's Decision)"; //$NON-NLS-1$
 		}
 
-		String charges = generateCharges();
-		String magicArea = generateMagicArea();
-		String powers = generateItemPowers();
+		String charges = charges();
+		String magicArea = magicArea();
+		String powers = itemPowers();
 
 		amount.append("[Misc: " + type + " [Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		return amount.toString();
 
 	}
 
-	private String generateCharges() {
+	private String charges() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		if (value < 31) {
 			amount.append("Continually Functioning"); //$NON-NLS-1$
 		} else if (value < 71) {
@@ -631,9 +634,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return amount.toString();
 	}
 
-	private String generateMagicArea() {
+	private String magicArea() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		if (value < 6) {
 			amount.append("Earth"); //$NON-NLS-1$
 		} else if (value < 10) {
@@ -688,57 +691,57 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 
 	}
 
-	private String generateItemPowers() {
+	private String itemPowers() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 		String type;
 
 		if (value < 6) {
-			String curse = generateCurse();
+			String curse = curse();
 			type = "Cursed [" + curse + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 36) {
-			int power = roll(1, 3) - 1;
+			int power = rollDice(1, 3) - 1;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 51) {
-			int power = roll(1, 3);
+			int power = rollDice(1, 3);
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 58) {
-			int power = roll(1, 3) + 1;
+			int power = rollDice(1, 3) + 1;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 68) {
-			int power = roll(1, 6) - 1;
+			int power = rollDice(1, 6) - 1;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 76) {
-			int power = roll(1, 6);
+			int power = rollDice(1, 6);
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 81) {
-			int power = roll(1, 6) + 1;
+			int power = rollDice(1, 6) + 1;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 85) {
-			int power = roll(1, 6) - 1;
+			int power = rollDice(1, 6) - 1;
 			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 87) {
-			int power = roll(1, 6);
+			int power = rollDice(1, 6);
 			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 89) {
-			int power = roll(1, 3) - 1;
+			int power = rollDice(1, 3) - 1;
 			type = "3 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 91) {
-			int power = roll(1, 6) - 1;
+			int power = rollDice(1, 6) - 1;
 			type = "3 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 93) {
-			int power = roll(1, 6) + 1;
+			int power = rollDice(1, 6) + 1;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 95) {
-			int power = roll(1, 6) + 2;
+			int power = rollDice(1, 6) + 2;
 			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 97) {
-			int power = roll(1, 6) + 2;
+			int power = rollDice(1, 6) + 2;
 			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
-			type = generateItemPowers();
+			type = itemPowers();
 			type += "    AND    "; //$NON-NLS-1$
-			type += generateItemPowers();
+			type += itemPowers();
 		}
 
 		amount.append(type);
@@ -746,9 +749,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return amount.toString();
 	}
 
-	private String generateCurse() {
+	private String curse() {
 		StringBuilder amount = new StringBuilder();
-		int value = roll(1, 100);
+		int value = rollDice(1, 100);
 
 		if (value < 11) {
 			amount.append("Save Vs. Magic or take 2D20 Points of Damage when touched."); //$NON-NLS-1$
@@ -781,10 +784,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return amount.toString();
 	}
 
-	private int roll(int numOfDie, int sizeOfDie) {
+	private int rollDice(int numOfDie, int sizeOfDie) {
 		int value = 0;
 		for (int i = 0; i < numOfDie; i++) {
-			value += (int) (rand.nextDouble() * sizeOfDie + 1);
+			value += (int) (mRandom.nextDouble() * sizeOfDie + 1);
 		}
 		return value;
 	}
