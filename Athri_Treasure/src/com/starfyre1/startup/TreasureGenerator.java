@@ -69,8 +69,8 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	/*****************************************************************************
 	 * Constants
 	 ****************************************************************************/
-	private static final String			TITLE			= "Treasure Generator";
-	private static final String			VERSION			= " V1.0.1";
+	private static final String			TITLE			= "Treasure Generator";																																																													//$NON-NLS-1$
+	private static final String			VERSION			= " V1.0.1";																																																															//$NON-NLS-1$
 	private static final String[]		LABELS			= { "CP", "SP", "GP", "Gems", "Jewelry", "Magic Items" };																																																				//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	private static final String[]		GEMS_VALUES		= { "10 SP", "50 SP", "100 SP", "500 SP", "1000 SP*", "5000 SP**" };																																																	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
