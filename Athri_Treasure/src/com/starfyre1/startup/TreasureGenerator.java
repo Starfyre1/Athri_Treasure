@@ -268,8 +268,10 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		return display.toString();
 	}
 
+	StringBuilder mAmount;
+
 	private String generateGems(int count, boolean fromJewelry) {
-		StringBuilder amount = new StringBuilder();
+		mAmount = new StringBuilder();
 		int[] gems = { 0, 0, 0, 0, 0, 0 };
 		mGemValue = 0;
 
@@ -307,17 +309,17 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 			if (gem > 0) {
 				if (i == 4) {
 					// 5% is magical or has spell cast on it
-					amount.append(determineMagicGems(gem, 95, fromJewelry));
+					mAmount.append(determineMagicGems(gem, 95, fromJewelry));
 				} else if (i == 5) {
 					// 10% is magical or has spell cast on it
-					amount.append(determineMagicGems(gem, 90, fromJewelry));
+					mAmount.append(determineMagicGems(gem, 90, fromJewelry));
 				} else {
-					amount.append("\t[" + gem + " Gems = " + GEMS_VALUES[i] + "]" + (fromJewelry ? "" : "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					mAmount.append((fromJewelry ? "\n\t" : "") + "\t[" + gem + " Gems = " + GEMS_VALUES[i] + "]" + (fromJewelry ? "" : "\n")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 				}
 			}
 		}
 
-		return amount.toString();
+		return mAmount.toString();
 	}
 
 	private String determineMagicGems(int count, int percentage, boolean fromJewelry) {
@@ -331,11 +333,24 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 				String magicArea = generateMagicArea();
 				String powers = generateItemPowers();
 
-				text += (fromJewelry ? "" : "\n\t") + "\t[1 Gem = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]" + "[Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+				text += "\n\t\t[1 Gem = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]" + "[Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 			}
 		}
 		if (count > 0) {
-			other = "\t[" + count + " Gems = " + GEMS_VALUES[percentage == 95 ? 4 : 5] + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (percentage == 95) {
+				other = (fromJewelry ? "\n\t" : "") + "\t[" + count + " Gems = " + GEMS_VALUES[4] + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			} else {
+				String addNewLine = ""; //$NON-NLS-1$
+				System.out.println(other);
+				if (!other.isEmpty()) {
+					String test = other.substring(other.length() - 2);
+					System.out.println("::" + test + "::"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (test.equals("]\t")) { //$NON-NLS-1$
+						addNewLine = "\n"; //$NON-NLS-1$
+					}
+				}
+				other = addNewLine + (fromJewelry ? "\n\t" : "") + "\t[" + count + " Gems = " + GEMS_VALUES[5] + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			}
 		}
 		return other + text + (fromJewelry ? "" : "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
