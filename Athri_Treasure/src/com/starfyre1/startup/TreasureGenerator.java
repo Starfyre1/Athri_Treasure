@@ -400,189 +400,181 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 	}
 
 	private String magicWeapon() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
-		String type;
+
 		if (value < 26) {
-			type = "Longsword"; //$NON-NLS-1$
+			return "[" + getMetal() + " Longsword with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 36) {
-			type = "Broadsword"; //$NON-NLS-1$
+			return "[" + getMetal() + " Broadsword with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 41) {
-			type = "Katana"; //$NON-NLS-1$
+			return "[" + getMetal() + " Katana with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 51) {
-			type = "Saber"; //$NON-NLS-1$
+			return "[" + getMetal() + " Saber with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 56) {
-			type = "Claymore"; //$NON-NLS-1$
+			return "[" + getMetal() + " Claymore with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 66) {
-			type = "Bastard Sword"; //$NON-NLS-1$
+			return "[" + getMetal() + " Bastard Sword with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if (value < 76) {
-			type = "Two-Handed Sword"; //$NON-NLS-1$
-		} else {
-			type = miscWeapon();
+			return "[" + getMetal() + " Two-Handed Sword with " + runes() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
+		return miscWeapon();
+	}
 
-		String rune = runes();
-		amount.append("[" + type + " with " + rune + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private String getMetal() {
+		int value = rollDice(1, 100);
 
-		return amount.toString();
+		if (value < 51) {
+			return "Borang"; //$NON-NLS-1$
+		} else if (value < 71) {
+			return "Ardacer"; //$NON-NLS-1$
+		} else if (value < 86) {
+			return "Ethru"; //$NON-NLS-1$
+		} else if (value < 96) {
+			return "Ithilnar"; //$NON-NLS-1$
+		} else if (value < 100) {
+			return "Mithril"; //$NON-NLS-1$
+		}
+		return "Eog"; //$NON-NLS-1$
 	}
 
 	private String miscWeapon() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
-		String type;
+
 		if (value < 6) {
-			type = "Mace (Light)"; //$NON-NLS-1$
+			return "Mace (Light)"; //$NON-NLS-1$
 		} else if (value < 11) {
-			type = "Mace (Heavy)"; //$NON-NLS-1$
+			return "Mace (Heavy)"; //$NON-NLS-1$
 		} else if (value < 21) {
-			type = "War Hammer"; //$NON-NLS-1$
+			return "War Hammer"; //$NON-NLS-1$
 		} else if (value < 26) {
-			type = "Wakazashi"; //$NON-NLS-1$
+			return "Wakazashi"; //$NON-NLS-1$
 		} else if (value < 36) {
-			type = "Large Axe"; //$NON-NLS-1$
+			return "Large Axe"; //$NON-NLS-1$
 		} else if (value < 46) {
-			type = "Great Axe"; //$NON-NLS-1$
+			return "Great Axe"; //$NON-NLS-1$
 		} else if (value < 61) {
-			type = "Staff"; //$NON-NLS-1$
+			return "Staff"; //$NON-NLS-1$
 		} else if (value < 66) {
-			type = "Scythe"; //$NON-NLS-1$
+			return "Scythe"; //$NON-NLS-1$
 		} else if (value < 71) {
-			type = "Whip"; //$NON-NLS-1$
+			return "Whip"; //$NON-NLS-1$
 		} else if (value < 76) {
-			type = "Shuriken"; //$NON-NLS-1$
+			return "Shuriken"; //$NON-NLS-1$
 		} else if (value < 81) {
-			type = "Spear"; //$NON-NLS-1$
+			return "Spear"; //$NON-NLS-1$
 		} else if (value < 86) {
-			type = "Throwing Spikes"; //$NON-NLS-1$
+			return "Throwing Spikes"; //$NON-NLS-1$
 		} else if (value < 91) {
-			type = "Bow *"; //$NON-NLS-1$
+			return "Bow *"; //$NON-NLS-1$
 		} else if (value < 96) {
-			type = "Bow Composite **"; //$NON-NLS-1$
-		} else {
-			type = "Crossbow ***"; //$NON-NLS-1$
+			return "Bow Composite **"; //$NON-NLS-1$
 		}
-
-		amount.append(type);
-
-		return amount.toString();
+		return "Crossbow ***"; //$NON-NLS-1$
 	}
 
 	private String runes() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 		if (value < 51) {
-			amount.append("Rune of Combat I"); //$NON-NLS-1$
+			return "Rune of Combat I"; //$NON-NLS-1$
 		} else if (value < 81) {
-			amount.append("Rune of Combat II"); //$NON-NLS-1$
+			return "Rune of Combat II"; //$NON-NLS-1$
 		} else if (value < 93) {
-			amount.append("Rune of Combat III"); //$NON-NLS-1$
+			return "Rune of Combat III"; //$NON-NLS-1$
 		} else if (value < 98) {
-			amount.append("Rune of Combat IV"); //$NON-NLS-1$
+			return "Rune of Combat IV"; //$NON-NLS-1$
 		} else if (value < 100) {
-			amount.append("Rune of Combat V"); //$NON-NLS-1$
-		} else {
-			amount.append(" Holy Sword"); //$NON-NLS-1$
+			return "Rune of Combat V"; //$NON-NLS-1$
 		}
-		return amount.toString();
-
+		return " Holy Sword"; //$NON-NLS-1$
 	}
 
 	private String magicArmor() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 		String type;
 		if (value < 5) {
 			type = "Heavy Cloth"; //$NON-NLS-1$
 		} else if (value < 9) {
-			type = "Ring / Cloth"; //$NON-NLS-1$
+			type = getMetal() + " Ring / Cloth"; //$NON-NLS-1$
 		} else if (value < 11) {
-			type = "Laminate"; //$NON-NLS-1$
+			type = getMetal() + " Laminate"; //$NON-NLS-1$
 		} else if (value < 16) {
 			type = "Leather"; //$NON-NLS-1$
 		} else if (value < 30) {
-			type = "Studded Leather"; //$NON-NLS-1$
+			type = getMetal() + " Studded Leather"; //$NON-NLS-1$
 		} else if (value < 45) {
-			type = "Ring Mail"; //$NON-NLS-1$
+			type = getMetal() + " Ring Mail"; //$NON-NLS-1$
 		} else if (value < 55) {
-			type = "Scale Mail"; //$NON-NLS-1$
+			type = getMetal() + " Scale Mail"; //$NON-NLS-1$
 		} else if (value < 70) {
-			type = "Chain Mail"; //$NON-NLS-1$
+			type = getMetal() + " Chain Mail"; //$NON-NLS-1$
 		} else if (value < 80) {
-			type = "Banded Mail"; //$NON-NLS-1$
+			type = getMetal() + " Banded Mail"; //$NON-NLS-1$
 		} else if (value < 90) {
-			type = "Plate Mail"; //$NON-NLS-1$
+			type = getMetal() + " Plate Mail"; //$NON-NLS-1$
 		} else {
-			type = "Field Plate"; //$NON-NLS-1$
+			type = getMetal() + " Field Plate"; //$NON-NLS-1$
 		}
 
 		String spell = defensiveSpell();
 
-		amount.append("[" + type + " w/ " + spell + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-		return amount.toString();
+		return "[" + type + " w/ " + spell + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	private String defensiveSpell() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 		if (value < 21) {
-			amount.append("Shield I"); //$NON-NLS-1$
+			return "Shield I"; //$NON-NLS-1$
 		} else if (value < 31) {
-			amount.append("Shield II"); //$NON-NLS-1$
+			return "Shield II"; //$NON-NLS-1$
 		} else if (value < 36) {
-			amount.append("Shield III"); //$NON-NLS-1$
+			return "Shield III"; //$NON-NLS-1$
 		} else if (value < 39) {
-			amount.append("Shield IV"); //$NON-NLS-1$
+			return "Shield IV"; //$NON-NLS-1$
 		} else if (value < 41) {
-			amount.append("Shield V"); //$NON-NLS-1$
+			return "Shield V"; //$NON-NLS-1$
 		} else if (value < 51) {
-			amount.append("Absorb I"); //$NON-NLS-1$
+			return "Absorb I"; //$NON-NLS-1$
 		} else if (value < 56) {
-			amount.append("Absorb II"); //$NON-NLS-1$
+			return "Absorb II"; //$NON-NLS-1$
 		} else if (value < 61) {
-			amount.append("Absorb III"); //$NON-NLS-1$
+			return "Absorb III"; //$NON-NLS-1$
 		} else if (value < 71) {
-			amount.append("Protection I"); //$NON-NLS-1$
+			return "Protection I"; //$NON-NLS-1$
 		} else if (value < 76) {
-			amount.append("Protection II"); //$NON-NLS-1$
+			return "Protection II"; //$NON-NLS-1$
 		} else if (value < 81) {
-			amount.append("Protection III"); //$NON-NLS-1$
+			return "Protection III"; //$NON-NLS-1$
 		} else if (value < 86) {
-			amount.append("Protection IV"); //$NON-NLS-1$
+			return "Protection IV"; //$NON-NLS-1$
 		} else if (value < 89) {
-			amount.append("Protection V"); //$NON-NLS-1$
+			return "Protection V"; //$NON-NLS-1$
 		} else if (value < 90) {
-			amount.append("Protection VI"); //$NON-NLS-1$
+			return "Protection VI"; //$NON-NLS-1$
 		} else if (value < 91) {
-			amount.append("Protection VII"); //$NON-NLS-1$
+			return "Protection VII"; //$NON-NLS-1$
 		} else if (value < 92) {
-			amount.append("Protection: Aura"); //$NON-NLS-1$
+			return "Protection: Aura"; //$NON-NLS-1$
 		} else if (value < 93) {
-			amount.append("Protection: Animals"); //$NON-NLS-1$
+			return "Protection: Animals"; //$NON-NLS-1$
 		} else if (value < 94) {
-			amount.append("Protection: Charms"); //$NON-NLS-1$
+			return "Protection: Charms"; //$NON-NLS-1$
 		} else if (value < 95) {
-			amount.append("Protection: Cold"); //$NON-NLS-1$
+			return "Protection: Cold"; //$NON-NLS-1$
 		} else if (value < 96) {
-			amount.append("Protection: Fire"); //$NON-NLS-1$
+			return "Protection: Fire"; //$NON-NLS-1$
 		} else if (value < 97) {
-			amount.append("Protection: Dark"); //$NON-NLS-1$
+			return "Protection: Dark"; //$NON-NLS-1$
 		} else if (value < 98) {
-			amount.append("Protection: Demons"); //$NON-NLS-1$
+			return "Protection: Demons"; //$NON-NLS-1$
 		} else if (value < 99) {
-			amount.append("Protection: Fear"); //$NON-NLS-1$
+			return "Protection: Fear"; //$NON-NLS-1$
 		} else if (value < 100) {
-			amount.append("Protection: Lightning"); //$NON-NLS-1$
-		} else {
-			amount.append("Protection: Missiles"); //$NON-NLS-1$
+			return "Protection: Lightning"; //$NON-NLS-1$
 		}
-		return amount.toString();
-
+		return "Protection: Missiles"; //$NON-NLS-1$
 	}
 
 	private String miscMagic() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 		String type;
 
@@ -615,173 +607,139 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		String magicArea = magicArea();
 		String powers = itemPowers();
 
-		amount.append("[Misc: " + type + " [Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		return amount.toString();
+		return "[Misc: " + type + " [Charging Type: " + charges + "] [Spell Area: " + magicArea + "] [Spells: " + powers + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 	}
 
 	private String charges() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 		if (value < 31) {
-			amount.append("Continually Functioning"); //$NON-NLS-1$
+			return "Continually Functioning"; //$NON-NLS-1$
 		} else if (value < 71) {
-			amount.append("User Recharge"); //$NON-NLS-1$
-		} else {
-			amount.append("Recharges @ 5 Mana / hour"); //$NON-NLS-1$
+			return "User Recharge"; //$NON-NLS-1$
 		}
-
-		return amount.toString();
+		return "Recharges @ 5 Mana / hour"; //$NON-NLS-1$
 	}
 
 	private String magicArea() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
-		if (value < 6) {
-			amount.append("Earth"); //$NON-NLS-1$
-		} else if (value < 10) {
-			amount.append("Air"); //$NON-NLS-1$
-		} else if (value < 14) {
-			amount.append("Fire"); //$NON-NLS-1$
-		} else if (value < 19) {
-			amount.append("Water"); //$NON-NLS-1$
-		} else if (value < 26) {
-			amount.append("Natural Lore"); //$NON-NLS-1$
-		} else if (value < 37) {
-			amount.append("Arcane Lore"); //$NON-NLS-1$
-		} else if (value < 42) {
-			amount.append("Shadow"); //$NON-NLS-1$
-		} else if (value < 48) {
-			amount.append("Control"); //$NON-NLS-1$
-		} else if (value < 56) {
-			amount.append("Necromancy"); //$NON-NLS-1$
-		} else if (value < 61) {
-			amount.append("Adon"); //$NON-NLS-1$
-		} else if (value < 66) {
-			amount.append("Pelon"); //$NON-NLS-1$
-		} else if (value < 71) {
-			amount.append("Narius"); //$NON-NLS-1$
-		} else if (value < 76) {
-			amount.append("Mistress Night"); //$NON-NLS-1$
-		} else if (value < 81) {
-			amount.append("Tarn"); //$NON-NLS-1$
-		} else if (value < 86) {
-			amount.append("Lorrell"); //$NON-NLS-1$
-		} else if (value < 91) {
-			amount.append("Wynd"); //$NON-NLS-1$
-		} else if (value < 94) {
-			amount.append("Ryelle"); //$NON-NLS-1$
-		} else if (value < 95) {
-			amount.append("Tarot"); //$NON-NLS-1$
-		} else if (value < 96) {
-			amount.append("Chauntil"); //$NON-NLS-1$
-		} else if (value < 97) {
-			amount.append("Talon"); //$NON-NLS-1$
-		} else if (value < 98) {
-			amount.append("Orn"); //$NON-NLS-1$
-		} else if (value < 99) {
-			amount.append("Sarn"); //$NON-NLS-1$
-		} else if (value < 100) {
-			amount.append("Nerese"); //$NON-NLS-1$
-		} else {
-			amount.append("Thaer"); //$NON-NLS-1$
-		}
 
-		return amount.toString();
+		if (value < 6) {
+			return "Earth"; //$NON-NLS-1$
+		} else if (value < 10) {
+			return "Air"; //$NON-NLS-1$
+		} else if (value < 14) {
+			return "Fire"; //$NON-NLS-1$
+		} else if (value < 19) {
+			return "Water"; //$NON-NLS-1$
+		} else if (value < 26) {
+			return "Natural Lore"; //$NON-NLS-1$
+		} else if (value < 37) {
+			return "Arcane Lore"; //$NON-NLS-1$
+		} else if (value < 42) {
+			return "Shadow"; //$NON-NLS-1$
+		} else if (value < 48) {
+			return "Control"; //$NON-NLS-1$
+		} else if (value < 56) {
+			return "Necromancy"; //$NON-NLS-1$
+		} else if (value < 61) {
+			return "Adon"; //$NON-NLS-1$
+		} else if (value < 66) {
+			return "Pelon"; //$NON-NLS-1$
+		} else if (value < 71) {
+			return "Narius"; //$NON-NLS-1$
+		} else if (value < 76) {
+			return "Mistress Night"; //$NON-NLS-1$
+		} else if (value < 81) {
+			return "Tarn"; //$NON-NLS-1$
+		} else if (value < 86) {
+			return "Lorrell"; //$NON-NLS-1$
+		} else if (value < 91) {
+			return "Wynd"; //$NON-NLS-1$
+		} else if (value < 94) {
+			return "Ryelle"; //$NON-NLS-1$
+		} else if (value < 95) {
+			return "Tarot"; //$NON-NLS-1$
+		} else if (value < 96) {
+			return "Chauntil"; //$NON-NLS-1$
+		} else if (value < 97) {
+			return "Talon"; //$NON-NLS-1$
+		} else if (value < 98) {
+			return "Orn"; //$NON-NLS-1$
+		} else if (value < 99) {
+			return "Sarn"; //$NON-NLS-1$
+		} else if (value < 100) {
+			return "Nerese"; //$NON-NLS-1$
+		}
+		return "Thaer"; //$NON-NLS-1$
 
 	}
 
 	private String itemPowers() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
-		String type;
 
 		if (value < 6) {
-			String curse = curse();
-			type = "Cursed [" + curse + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "Cursed [" + curse() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 36) {
-			int power = rollDice(1, 3) - 1;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 3) - 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 51) {
-			int power = rollDice(1, 3);
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + rollDice(1, 3) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 58) {
-			int power = rollDice(1, 3) + 1;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 3) + 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 68) {
-			int power = rollDice(1, 6) - 1;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 6) - 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 76) {
-			int power = rollDice(1, 6);
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + rollDice(1, 6) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 81) {
-			int power = rollDice(1, 6) + 1;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 6) + 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 85) {
-			int power = rollDice(1, 6) - 1;
-			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "2 Spell (Power " + (rollDice(1, 6) - 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 87) {
-			int power = rollDice(1, 6);
-			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "2 Spell (Power " + rollDice(1, 6) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 89) {
-			int power = rollDice(1, 3) - 1;
-			type = "3 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "3 Spell (Power " + (rollDice(1, 3) - 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 91) {
-			int power = rollDice(1, 6) - 1;
-			type = "3 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "3 Spell (Power " + (rollDice(1, 6) - 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 93) {
-			int power = rollDice(1, 6) + 1;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 6) + 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 95) {
-			int power = rollDice(1, 6) + 2;
-			type = "1 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + rollDice(1, 6) + 2 + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 97) {
-			int power = rollDice(1, 6) + 2;
-			type = "2 Spell (Power " + power + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			type = itemPowers();
-			type += "    AND    "; //$NON-NLS-1$
-			type += itemPowers();
+			return "2 Spell (Power " + rollDice(1, 6) + 2 + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
+		return itemPowers() + "    AND    " + itemPowers(); //$NON-NLS-1$
 
-		amount.append(type);
-
-		return amount.toString();
 	}
 
 	private String curse() {
-		StringBuilder amount = new StringBuilder();
 		int value = rollDice(1, 100);
 
 		if (value < 11) {
-			amount.append("Save Vs. Magic or take 2D20 Points of Damage when touched."); //$NON-NLS-1$
+			return "Save Vs. Magic or take 2D20 Points of Damage when touched."; //$NON-NLS-1$
 		} else if (value < 21) {
-			amount.append("Save Vs. Stress or go insane for 1D100 Days."); //$NON-NLS-1$
+			return "Save Vs. Stress or go insane for 1D100 Days."; //$NON-NLS-1$
 		} else if (value < 31) {
-			amount.append("This item has been enchanted with an \" Entity of Evil \" spell."); //$NON-NLS-1$
+			return "This item has been enchanted with an \" Entity of Evil \" spell."; //$NON-NLS-1$
 		} else if (value < 41) {
-			amount.append("Character touching this item is the recipient of a \" Call to Law/Chaos\" spell."); //$NON-NLS-1$
+			return "Character touching this item is the recipient of a \" Call to Law/Chaos\" spell."; //$NON-NLS-1$
 		} else if (value < 56) {
-			amount.append("Take 1D8+2 Hit Points of Damage when touched."); //$NON-NLS-1$
+			return "Take 1D8+2 Hit Points of Damage when touched."; //$NON-NLS-1$
 		} else if (value < 61) {
-			amount.append("Take 2D8 Hit Points of Damage when the item is activated."); //$NON-NLS-1$
+			return "Take 2D8 Hit Points of Damage when the item is activated."; //$NON-NLS-1$
 		} else if (value < 66) {
-			amount.append("Causes Blackouts (as per Spell Failure Chart) 20% chance per hour."); //$NON-NLS-1$
+			return "Causes Blackouts (as per Spell Failure Chart) 20% chance per hour."; //$NON-NLS-1$
 		} else if (value < 69) {
-			amount.append("Character touching this item is the recipient of a \" Level Loss I “spell."); //$NON-NLS-1$
+			return "Character touching this item is the recipient of a \" Level Loss I “spell."; //$NON-NLS-1$
 		} else if (value < 76) {
-			amount.append("Save Vs. Magic or be the recipient of \" Sleep Eternal \" spell."); //$NON-NLS-1$
+			return "Save Vs. Magic or be the recipient of \" Sleep Eternal \" spell."; //$NON-NLS-1$
 		} else if (value < 86) {
-			amount.append("Lose (1) point of a random requisite permanently."); //$NON-NLS-1$
+			return "Lose (1) point of a random requisite permanently."; //$NON-NLS-1$
 		} else if (value < 91) {
-			amount.append("Causes the character with this in their posession to go \" Berserk \", as per the Warrior section, whenever in \" Hand - to - Hand \" combat."); //$NON-NLS-1$
+			return "Causes the character with this in their posession to go \" Berserk \", as per the Warrior section, whenever in \" Hand - to - Hand \" combat."; //$NON-NLS-1$
 		} else if (value < 96) {
-			amount.append("Lowers your Armor Rating by 15% when this item is worn."); //$NON-NLS-1$
-		} else {
-			amount.append("When you are wearing this item, if you are hit, you will take DOUBLE damage, and an automatic CRITICAL HIT."); //$NON-NLS-1$
+			return "Lowers your Armor Rating by 15% when this item is worn."; //$NON-NLS-1$
 		}
-
-		return amount.toString();
+		return "When you are wearing this item, if you are hit, you will take DOUBLE damage, and an automatic CRITICAL HIT."; //$NON-NLS-1$
 	}
 
 	private int rollDice(int numOfDie, int sizeOfDie) {
