@@ -703,9 +703,9 @@ public class TreasureGenerator implements ActionListener, DocumentListener {
 		} else if (value < 93) {
 			return "1 Spell (Power " + (rollDice(1, 6) + 1) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 95) {
-			return "1 Spell (Power " + rollDice(1, 6) + 2 + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "1 Spell (Power " + (rollDice(1, 6) + 2) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (value < 97) {
-			return "2 Spell (Power " + rollDice(1, 6) + 2 + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			return "2 Spell (Power " + (rollDice(1, 6) + 2) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return itemPowers() + "    AND    " + itemPowers(); //$NON-NLS-1$
 
